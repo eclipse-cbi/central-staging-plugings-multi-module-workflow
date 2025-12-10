@@ -178,23 +178,14 @@
                                 <id>create-bundle</id>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>rc-bundle</goal>
+                                    <goal>deploy</goal>
                                 </goals>
                                 <configuration>
+                                    <bearerCreate>true</bearerCreate>
+                                    <repositoryId>repo3.eclipse.org</repositoryId>
                                     <repositoryUrl>${eclipse.repo.url}${eclipse.staging.path}</repositoryUrl>
-                                    <signArtifacts>true</signArtifacts>
                                     <generateChecksums256>true</generateChecksums256>
                                     <generateChecksums512>true</generateChecksums512>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>upload-to-central</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>rc-upload</goal>
-                                </goals>
-                                <configuration>
-                                    <automaticPublishing>false</automaticPublishing>
                                 </configuration>
                             </execution>
                         </executions>
