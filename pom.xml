@@ -58,7 +58,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <central-staging-plugins.version>1.1.0-SNAPSHOT</central-staging-plugins.version>
+        <central-staging-plugins.version>1.2.0-SNAPSHOT</central-staging-plugins.version>
         <eclipse.repo.id>repo3.eclipse.org</eclipse.repo.id>
         <eclipse.repo.url>https://repo3.eclipse.org</eclipse.repo.url>
         <eclipse.staging.path>/repository/cbi-maven2-staging/</eclipse.staging.path>
