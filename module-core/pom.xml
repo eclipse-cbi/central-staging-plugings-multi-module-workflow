@@ -20,7 +20,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>module-core</artifactId>
+    <artifactId>central-staging-plugings-multi-module-workflow-module-core</artifactId>
     <packaging>jar</packaging>
 
     <name>Multi-Module Staging - Core Module</name>

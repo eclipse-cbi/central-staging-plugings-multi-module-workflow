@@ -49,7 +49,7 @@ jobs:
       
       - name: Build and deploy to repo3.eclipse.org
         run: |
-          mvn clean deploy -DskipTests
+          mvn clean deploy
         env:
           REPO3_TOKEN_USERNAME: ${{ secrets.REPO3_TOKEN_USERNAME }}
           REPO3_TOKEN_PASSWORD: ${{ secrets.REPO3_TOKEN_PASSWORD }}
