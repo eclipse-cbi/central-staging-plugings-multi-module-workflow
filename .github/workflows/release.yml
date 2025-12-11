@@ -2,13 +2,15 @@ name: Release to central
 
 on:
   push:
+    branches:
+      - '**'   # all branches
     tags:
       - 'v*.*.*' 
 
 jobs:
   release-to-central:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    # if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
       - name: Checkout code
@@ -23,37 +25,6 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       
-      - name: Configure Maven settings
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
-            <servers>
-              <server>
-                <id>repo3.eclipse.org</id>
-                <username>${{ secrets.REPO3_TOKEN_USERNAME }}</username>
-                <password>${{ secrets.REPO3_TOKEN_PASSWORD }}</password>
-              </server>
-              <server>
-                <id>central</id>
-                <username>${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}</username>
-                <password>${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}</password>
-              </server>
-            </servers>
-            <mirrors>
-              <mirror>
-                <id>eclipse.maven.central.mirror</id>
-                <name>Eclipse Central Proxy</name>
-                <url>https://repo3.eclipse.org/repository/maven-central/</url>
-                <mirrorOf>central</mirrorOf>
-              </mirror>
-            </mirrors>
-          </settings>
-          EOF
-      
       - name: Extract version from tag
         id: extract_version
         run: |
@@ -63,10 +34,17 @@ jobs:
       
       - name: Build and deploy to Maven Central
         run: |
-          mvn clean deploy -Pcentral-release -DskipTests
+          mvn clean deploy -Pcentral-release -DskipTests --settings settings.xml
         env:
+          REPO3_TOKEN_USERNAME: ${{ secrets.REPO3_TOKEN_USERNAME }}
+          REPO3_TOKEN_PASSWORD: ${{ secrets.REPO3_TOKEN_PASSWORD }}
+          CENTRAL_SONATYPE_TOKEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
+          CENTRAL_SONATYPE_TOKEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       
       - name: Check Maven Central upload status 
         run: |
-          mvn org.eclipse.cbi.central:central-staging-plugins:rc-status -Dcentral.bearerCreate=true
+          mvn org.eclipse.cbi.central:central-staging-plugins:rc-status -Dcentral.bearerCreate=true --settings settings.xml
+        env:
+          CENTRAL_SONATYPE_TOKEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
+          CENTRAL_SONATYPE_TOKEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
