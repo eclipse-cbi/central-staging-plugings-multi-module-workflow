@@ -56,8 +56,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <central-staging-plugins.version>1.1.0-SNAPSHOT</central-staging-plugins.version>
         <eclipse.repo.id>repo3.eclipse.org</eclipse.repo.id>
         <eclipse.repo.url>https://repo3.eclipse.org</eclipse.repo.url>
@@ -185,28 +185,15 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>org.eclipse.cbi.central</groupId>
                         <artifactId>central-staging-plugins</artifactId>
                         <version>${central-staging-plugins.version}</version>
                         <executions>
                             <execution>
                                 <id>create-bundle</id>
-                                <phase>package</phase>
+                                <phase>deploy</phase>
                                 <goals>
-                                    <goal>deploy</goal>
+                                    <goal>rc-sync</goal>
                                 </goals>
                                 <configuration>
                                     <bearerCreate>true</bearerCreate>
