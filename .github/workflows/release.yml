@@ -24,14 +24,16 @@ jobs:
           cache: maven
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      
-      - name: Extract version from tag
-        id: extract_version
+      - name: Remove SNAPSHOT from version
         run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "Release version: $TAG_NAME"
-      
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ $CURRENT_VERSION == *-SNAPSHOT ]]; then
+            RELEASE_VERSION=${CURRENT_VERSION%-SNAPSHOT}
+            mvn versions:set -DnewVersion=$RELEASE_VERSION -DgenerateBackupPoms=false
+            echo "Version changed from $CURRENT_VERSION to $RELEASE_VERSION"
+          else
+            echo "Version is already a release version: $CURRENT_VERSION"
+          fi
       - name: Build and deploy to Maven Central
         run: |
           mvn clean deploy -Pcentral-release -DskipTests --settings settings.xml
