@@ -23,7 +23,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Remove SNAPSHOT from version
