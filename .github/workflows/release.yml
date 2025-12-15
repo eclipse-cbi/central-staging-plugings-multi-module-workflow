@@ -37,6 +37,7 @@ jobs:
             echo "Version is already a release version: $CURRENT_VERSION"
           fi
       - name: Build and deploy to Maven Central
+        id: build_deploy
         run: |
           mvn clean deploy -Pcentral-release -DskipTests -Dcentral.bearerCreate=true --settings settings.xml
         env:
@@ -45,6 +46,15 @@ jobs:
           CENTRAL_SONATYPE_TOKEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
           CENTRAL_SONATYPE_TOKEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      
+      - name: Upload deployment staging bundle
+        if: always() && steps.build_deploy.conclusion != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-staging-bundle
+          path: target/deployment-staging.zip
+          retention-days: 7
+          if-no-files-found: warn
       
       - name: Check Maven Central upload status 
         run: |
