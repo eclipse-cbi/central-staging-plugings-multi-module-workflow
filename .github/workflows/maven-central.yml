@@ -1,0 +1,42 @@
+name: Release to maven central
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' 
+
+  workflow_dispatch:
+
+jobs:
+  release-to-central:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Remove SNAPSHOT from version
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -B)
+          if [[ $CURRENT_VERSION == *-SNAPSHOT ]]; then
+            RELEASE_VERSION=${CURRENT_VERSION%-SNAPSHOT}
+            mvn versions:set -DnewVersion=$RELEASE_VERSION -DgenerateBackupPoms=false -B
+            echo "Version changed from $CURRENT_VERSION to $RELEASE_VERSION"
+          else
+            echo "Version is already a release version: $CURRENT_VERSION"
+          fi
+
+      - name: Check Maven Central upload status 
+        run: |
+          mvn org.eclipse.cbi.central:central-staging-plugins:rc-publish -B -Dcentral.bearerCreate=true --settings settings.xml
+        env:
+          CENTRAL_SONATYPE_TOKEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
+          CENTRAL_SONATYPE_TOKEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
