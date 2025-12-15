@@ -7,6 +7,8 @@ on:
     tags:
       - 'v*.*.*' 
 
+  workflow_dispatch:
+
 jobs:
   release-to-central:
     runs-on: ubuntu-latest
